@@ -14,84 +14,87 @@
  * limitations under the License.
  *
  */
-#include "mbed.h"
+// #include "mbed.h"
 #include "MLX90640_I2C_Driver.h"
 
-I2C i2c(p9, p10);
+// I2C i2c(p9, p10);
+i2c_inst_t* i2c = i2c0;
+constexpr int i2c_timeout_us = 10000;
 
 void MLX90640_I2CInit()
-{   
-    i2c.stop();
+{
+    // i2c.stop();
 }
 
 int MLX90640_I2CGeneralReset(void)
-{    
+{
     int ack;
-    char cmd[2] = {0,0};
-    
-    cmd[0] = 0x00;
-    cmd[1] = 0x06;    
+    char cmd[2] = {0x00,0x06};
 
-    i2c.stop();
-    wait_us(5);    
-    ack = i2c.write(cmd[0], &cmd[1], 1, 0);
-    
-    if (ack != 0x00)
+    // i2c.stop();
+    wait_us(5);
+    ack = i2c_write_timeout_us(i2c, cmd[0], &cmd[1], 1, false, i2c_timeout_us);
+    // ack = i2c.write(cmd[0], &cmd[1], 1, 0);
+
+    if (ack == PICO_ERROR_GENERIC || ack == PICO_ERROR_TIMEOUT)
     {
         return -1;
-    }         
-    i2c.stop();   
-    
-    wait_us(50);    
-    
+    }
+    // i2c.stop();
+
+    wait_us(50);
+
     return 0;
 }
 
 int MLX90640_I2CRead(uint8_t slaveAddr, uint16_t startAddress, uint16_t nMemAddressRead, uint16_t *data)
 {
-    uint8_t sa;                           
-    int ack = 0;                               
+    uint8_t sa;
+    int ack = 0;
     int cnt = 0;
     int i = 0;
     char cmd[2] = {0,0};
     char i2cData[1664] = {0};
     uint16_t *p;
-    
+
     p = data;
     sa = (slaveAddr << 1);
     cmd[0] = startAddress >> 8;
     cmd[1] = startAddress & 0x00FF;
-    
-    i2c.stop();
-    wait_us(5);    
-    ack = i2c.write(sa, cmd, 2, 1);
-    
-    if (ack != 0x00)
+
+    // i2c.stop();
+    wait_us(5);
+    ack = i2c_write_timeout_us(i2c, sa, cmd, 2, true, i2c_timeout_us);
+    // ack = i2c.write(sa, cmd, 2, 1);
+
+    if (ack == PICO_ERROR_GENERIC || ack == PICO_ERROR_TIMEOUT)
     {
         return -1;
     }
-             
+
     sa = sa | 0x01;
-    ack = i2c.read(sa, i2cData, 2*nMemAddressRead, 0);
-    
-    if (ack != 0x00)
+    ack = i2c_read_timeout_us(i2c, sa, i2cData, 2*nMemAddressRead, false, i2c_timeout_us);
+    // ack = i2c.read(sa, i2cData, 2*nMemAddressRead, 0);
+
+    if (ack == PICO_ERROR_GENERIC || ack == PICO_ERROR_TIMEOUT)
     {
-        return -1; 
-    }          
-    i2c.stop();   
-    
+        return -1;
+    }
+    // i2c.stop();
+
     for(cnt=0; cnt < nMemAddressRead; cnt++)
     {
         i = cnt << 1;
         *p++ = (uint16_t)i2cData[i]*256 + (uint16_t)i2cData[i+1];
     }
-    
-    return 0;   
-} 
+
+    return 0;
+}
 
 void MLX90640_I2CFreqSet(int freq)
 {
-    i2c.frequency(1000*freq);
+    // i2c.frequency(1000*freq);
+	i2c_set_baudrate(&i2c, freq);
 }
 
 int MLX90640_I2CWrite(uint8_t slaveAddr, uint16_t writeAddress, uint16_t data)
@@ -108,23 +111,24 @@ int MLX90640_I2CWrite(uint8_t slaveAddr, uint16_t writeAddress, uint16_t data)
     cmd[2] = data >> 8;
     cmd[3] = data & 0x00FF;
 
-    i2c.stop();
-    wait_us(5);    
-    ack = i2c.write(sa, cmd, 4, 0);
-    
-    if (ack != 0x00)
+    // i2c.stop();
+    wait_us(5);
+    ack = i2c_write_timeout_us(i2c, sa, cmd, 4, false, i2c_timeout_us);
+    // ack = i2c.write(sa, cmd, 4, 0);
+
+    if (ack == PICO_ERROR_GENERIC || ack == PICO_ERROR_TIMEOUT)
     {
         return -1;
-    }         
-    i2c.stop();   
-    
+    }
+    // i2c.stop();
+
     MLX90640_I2CRead(slaveAddr,writeAddress,1, &dataCheck);
-    
+
     if ( dataCheck != data)
     {
         return -2;
-    }    
-    
+    }
+
     return 0;
 }
 
