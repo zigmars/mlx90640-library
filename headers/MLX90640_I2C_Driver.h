@@ -17,11 +17,15 @@
 #ifndef _MLX90640_I2C_Driver_H_
 #define _MLX90640_I2C_Driver_H_
 
-#include <hardware/i2c.h>
 #include <stdint.h>
 
-extern i2c_inst_t *i2c;
-void MLX90640_I2CInit(void);
+struct i2c_if {
+    virtual bool write(uint8_t slaveAddr, void* data, uint16_t dataSize, bool bval) = 0;
+    virtual bool read(uint8_t slaveAddr, void* data, uint16_t dataSize, bool bval) = 0;
+    virtual bool setFreq(uint32_t freq) = 0;
+};
+
+void MLX90640_I2CInit(i2c_if* const iface);
 int MLX90640_I2CGeneralReset(void);
 int MLX90640_I2CRead(uint8_t slaveAddr, uint16_t startAddress,
                      uint16_t nMemAddressRead, uint16_t *data);
