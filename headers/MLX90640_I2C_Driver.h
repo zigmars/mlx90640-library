@@ -20,12 +20,12 @@
 #include <stdint.h>
 
 struct i2c_if {
-    virtual bool write(uint8_t slaveAddr, void* data, uint16_t dataSize, bool bval) = 0;
+    virtual bool write(uint8_t slaveAddr, const void* data, uint16_t dataSize, bool bval) = 0;
     virtual bool read(uint8_t slaveAddr, void* data, uint16_t dataSize, bool bval) = 0;
-    virtual bool setFreq(uint32_t freq) = 0;
+    virtual void setFreq(uint32_t freq) = 0;
 };
 
-void MLX90640_I2CInit(i2c_if* const iface);
+void MLX90640_I2CInit(i2c_if* iface);
 int MLX90640_I2CGeneralReset(void);
 int MLX90640_I2CRead(uint8_t slaveAddr, uint16_t startAddress,
                      uint16_t nMemAddressRead, uint16_t *data);

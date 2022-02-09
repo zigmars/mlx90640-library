@@ -21,7 +21,7 @@
 // constexpr int i2c_timeout_us = 10000; // 10s
 static i2c_if* i2c;
 
-void MLX90640_I2CInit(i2c_if* const iface) {
+void MLX90640_I2CInit(i2c_if* iface) {
     i2c = iface;
 }
 
