@@ -55,27 +55,29 @@ typedef struct {
     uint16_t outlierPixels[5];
 } paramsMLX90640;
 
-int MLX90640_DumpEE(uint8_t slaveAddr, uint16_t *eeData);
-int MLX90640_SynchFrame(uint8_t slaveAddr);
-int MLX90640_TriggerMeasurement(uint8_t slaveAddr);
-int MLX90640_GetFrameData(uint8_t slaveAddr, uint16_t *frameData);
-int MLX90640_ExtractParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);
-float MLX90640_GetVdd(uint16_t *frameData, const paramsMLX90640 *params);
-float MLX90640_GetTa(uint16_t *frameData, const paramsMLX90640 *params);
-void MLX90640_GetImage(uint16_t *frameData, const paramsMLX90640 *params,
+namespace mlx90640 {
+int DumpEE(uint16_t *eeData);
+int SynchFrame();
+int TriggerMeasurement();
+int GetFrameData(uint16_t *frameData);
+int ExtractParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);
+float GetVdd(uint16_t *frameData, const paramsMLX90640 *params);
+float GetTa(uint16_t *frameData, const paramsMLX90640 *params);
+void GetImage(uint16_t *frameData, const paramsMLX90640 *params,
                        float *result);
-void MLX90640_CalculateTo(uint16_t *frameData, const paramsMLX90640 *params,
+void CalculateTo(uint16_t *frameData, const paramsMLX90640 *params,
                           float emissivity, float tr, float *result);
-int MLX90640_SetResolution(uint8_t slaveAddr, uint8_t resolution);
-int MLX90640_GetCurResolution(uint8_t slaveAddr);
-int MLX90640_SetRefreshRate(uint8_t slaveAddr, uint8_t refreshRate);
-int MLX90640_GetRefreshRate(uint8_t slaveAddr);
-int MLX90640_GetSubPageNumber(uint16_t *frameData);
-int MLX90640_GetCurMode(uint8_t slaveAddr);
-int MLX90640_SetInterleavedMode(uint8_t slaveAddr);
-int MLX90640_SetChessMode(uint8_t slaveAddr);
-void MLX90640_BadPixelsCorrection(uint16_t *pixels, float *to, int mode,
+int SetResolution(uint8_t resolution);
+int GetCurResolution();
+int SetRefreshRate(uint8_t refreshRate);
+int GetRefreshRate();
+int GetSubPageNumber(uint16_t *frameData);
+int GetCurMode();
+int SetInterleavedMode();
+int SetChessMode();
+void BadPixelsCorrection(uint16_t *pixels, float *to, int mode,
                                   paramsMLX90640 *params);
+}
 
 #ifdef __cplusplus
 }
